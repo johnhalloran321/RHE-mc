@@ -1295,10 +1295,10 @@ for(int i=0;i<num_snp;i++){
                                 // 11->2
                                 int val = y[l];
                                 if(val==1 && !allow_missing){
-                                        val = simulate2_geno_from_random(p_j);
-                                        val++;
-                                        val = (val==1) ? 0 : val;
-                                   //val=0;
+				  // val = simulate2_geno_from_random(p_j);
+				  // val++;
+				  // val = (val==1) ? 0 : val;
+				  val=0;
                                  }
                                 val-- ;
                                 val =  (val < 0 ) ? 0 :val ;
@@ -1646,16 +1646,22 @@ y_sum=pheno.sum();
 #else
  all_zb= MatrixXdr::Random(Nindv,Nz);
 #endif
-all_zb = all_zb * sqrt(3);
+ // all_zb = all_zb * sqrt(3);
 
+#ifndef TIMING_TEST
 boost::mt19937 seedr;
 seedr.seed(std::time(0));
 boost::normal_distribution<> dist(0,1);
 boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > z_vec(seedr, dist);
+#endif
 
 for (int i=0;i<Nz;i++)
    for(int j=0;j<Nindv;j++)
+#ifdef TIMING_TEST
+     all_zb(j,i)=(float) i / Nz;
+#else
       all_zb(j,i)=z_vec();
+#endif
 
 
 
