@@ -7,6 +7,7 @@
 #include <map>
 #include <fstream>
 #include <bits/stdc++.h>
+#include <type_traits>
 
 using namespace std;
 
@@ -34,15 +35,15 @@ struct options{
 	double beta;
 };
 
-template<typename T, typename U>
-struct is_same {
-    static const bool value = false; 
-};
+/* template<typename T, typename U> */
+/* struct is_same { */
+/*     static const bool value = false;  */
+/* }; */
 
-template<typename T>
-struct is_same<T,T> { 
-   static const bool value = true; 
-};
+/* template<typename T> */
+/* struct is_same<T,T> {  */
+/*    static const bool value = true;  */
+/* }; */
 
 
 extern options command_line_opts;
@@ -69,7 +70,8 @@ public:
 	static T string_to_T(std::string const &val){
 		std::istringstream istr(val);
 		T returnVal;
-		if(is_same<T,bool>::value){
+		/* if(is_same<T,bool>::value){ */
+		if(std::is_same<T,bool>::value){
 			if (!(istr >> std::boolalpha >> returnVal))
 				exitWithError("CFG: Not a valid bool received!\n");
 			return returnVal;

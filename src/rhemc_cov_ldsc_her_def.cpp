@@ -30,6 +30,8 @@
 	#define fastmultiply_pre fastmultiply_pre_normal
 #endif
 
+#define TIMING_TEST
+
 using namespace Eigen;
 using namespace std;
 
@@ -443,7 +445,11 @@ void initial_var()
         }
 
         //TODO: Initialization of c with gaussian distribution
-        c = MatrixXdr::Random(p,k);
+#ifdef TIMING_TEST	
+        c = MatrixXdr::Ones(p,k);
+#else
+	c = MatrixXdr::Random(p,k);
+#endif
 
 
         // Initial intermediate data structures
@@ -789,8 +795,11 @@ MatrixXdr  compute_XXUz (int num_snp){
 
 
 MatrixXdr  compute_Xz (int num_snp){
-
-         MatrixXdr new_zb= MatrixXdr::Random(Nz,num_snp);
+#ifdef TIMING_TEST
+         MatrixXdr new_zb= MatrixXdr::Ones(Nz,num_snp);
+#else
+	 MatrixXdr new_zb= MatrixXdr::Random(Nz,num_snp);
+#endif
          new_zb = new_zb * sqrt(3);
 
 	 MatrixXdr new_res(Nz, Nindv);         
@@ -1063,7 +1072,11 @@ void set_metadata() {
 
 
 int simulate2_geno_from_random(float p_j){
-        float rval = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+#ifdef TIMING_TEST
+        float rval = 10;
+#else
+	float rval = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+#endif
         float dist_pj[3] = { (1-p_j)*(1-p_j), 2*p_j*(1-p_j), p_j*p_j };
         if(rval < dist_pj[0] )
                 return 0;
@@ -1469,13 +1482,9 @@ parse_args(argc,argv);
         k = k_orig + command_line_opts.l;
         k = (int)ceil(k/10.0)*10;
         command_line_opts.l = k - k_orig;
-        //p = Nsnp;
-        //n = Nindv;
-        //bool toStop=false;
-       // toStop=true;
+#ifndef TIMING_TEST	
         srand((unsigned int) time(0));
-        //srand(1);
-	//Nz=10;
+#endif
 	Nz=command_line_opts.num_of_evec;
         k=Nz;
          ///clock_t io_end = clock();
@@ -1632,7 +1641,11 @@ y_sum=pheno.sum();
 //define random vector z's
 //Nz=1;
 
-all_zb= MatrixXdr::Random(Nindv,Nz);
+#ifdef TIMING_TEST
+ all_zb= MatrixXdr::Ones(Nindv,Nz);
+#else
+ all_zb= MatrixXdr::Random(Nindv,Nz);
+#endif
 all_zb = all_zb * sqrt(3);
 
 boost::mt19937 seedr;
