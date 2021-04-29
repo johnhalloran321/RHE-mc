@@ -31,7 +31,7 @@
 #define fastmultiply_pre fastmultiply_pre_normal
 #endif
 
-#define TIMING_TEST
+// #define TIMING_TEST
 
 using namespace Eigen;
 using namespace std;
