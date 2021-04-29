@@ -3,7 +3,8 @@
 #include <iostream>
 #include <string>
 #include <stdlib.h>
-#include <vector> 
+#include <vector>
+#include <omp.h>
 //#include <random>
 
 #include <bits/stdc++.h>
@@ -30,7 +31,7 @@
 #define fastmultiply_pre fastmultiply_pre_normal
 #endif
 
-// #define TIMING_TEST
+#define TIMING_TEST
 
 using namespace Eigen;
 using namespace std;
