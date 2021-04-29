@@ -20,7 +20,8 @@ struct options{
 	std::string COVARIATE_NAME; 
 	std::string OUTPUT_PATH;
 	 std::string Annot_PATH;
-	int batchNum; 
+	int batchNum;
+  	int num_threads; 
 	int num_of_evec ;
 	int jack_number;
 
@@ -198,6 +199,7 @@ void parse_args(int argc, char const *argv[]){
 	
 	// Setting Default Values
 	command_line_opts.num_of_evec=2;
+	command_line_opts.num_threads=1;
 	command_line_opts.getaccuracy=false;
 	command_line_opts.debugmode=false;
 	command_line_opts.OUTPUT_PATH = "";
@@ -273,6 +275,10 @@ void parse_args(int argc, char const *argv[]){
 			}
 			else if(strcmp(argv[i],"-k")==0){
 				command_line_opts.num_of_evec = atoi(argv[i+1]);
+				i++;
+			}
+			else if(strcmp(argv[i],"-threads")==0){
+			  command_line_opts.num_threads = atoi(argv[i+1]);
 				i++;
 			}
 			else if(strcmp(argv[i],"-b")==0){

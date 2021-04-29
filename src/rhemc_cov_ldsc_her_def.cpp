@@ -1470,7 +1470,8 @@ int main(int argc, char const *argv[]){
   ////////////////////////////////////////////
   ///////////////////////////////////////////
   
-  //MAX_ITER =  command_line_opts.max_iterations ; 
+  //MAX_ITER =  command_line_opts.max_iterations ;
+  int num_threads = command_line_opts.num_threads;
   int B = command_line_opts.batchNum;
   k_orig = command_line_opts.num_of_evec ;
   debug = command_line_opts.debugmode ;
@@ -1489,6 +1490,15 @@ int main(int argc, char const *argv[]){
 
   Njack=command_line_opts.jack_number;
 
+  // Check number of supplied threads
+  if(num_threads > 1){
+    if(num_threads > omp_get_max_threads()){
+      num_threads = omp_get_max_threads();
+    }
+    cout << "Using " << num_threads << " parallel threads" << endl;
+    omp_set_num_threads(num_threads);
+  }
+  
   ////
   string filename;
   //////////////////////////// Read multi genotypes
