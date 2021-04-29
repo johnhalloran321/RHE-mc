@@ -30,7 +30,7 @@
 #define fastmultiply_pre fastmultiply_pre_normal
 #endif
 
-#define TIMING_TEST
+// #define TIMING_TEST
 
 using namespace Eigen;
 using namespace std;
@@ -1976,7 +1976,7 @@ int main(int argc, char const *argv[]){
   MatrixXdr B2;
   MatrixXdr C1;
   MatrixXdr C2;
-  double trkij;
+  // double trkij;
   double yy=(pheno.array() * pheno.array()).sum();
 
 
@@ -2019,49 +2019,24 @@ int main(int argc, char const *argv[]){
     cout<<len[i]<<endl;
   */
 
-  MatrixXdr h1;
-  MatrixXdr h2;
-  MatrixXdr h3;
+  // MatrixXdr h1;
+  // MatrixXdr h2;
+  // MatrixXdr h3;
 
   double trkij_res1;
   double trkij_res2;
   double trkij_res3;
-  // double tk_res;
+  double tk_res;
   
   for (jack_index=0;jack_index<=Njack;jack_index++){
-#pragma omp parallel for schedule(dynamic, 1)
+    // #pragma omp parallel for schedule(dynamic, 1)
     for (int i=0;i<Nbin;i++){
-      MatrixXdr B1_i;
-      MatrixXdr B2_i;
-      MatrixXdr C1_i;
-      MatrixXdr C2_i;
+      // MatrixXdr B1_i;
+      // MatrixXdr B2_i;
+      // MatrixXdr C1_i;
+      // MatrixXdr C2_i;
 
-      double tk_res;
-
-      if(both_side_cov==false)	
-	b_trk(i,0)=Nindv_mask;
-
-      if( jack_index<Njack && len[i]==jack_bin[jack_index][i])
-	jack_bin[jack_index][i]=0;
-
-
-      if(jack_index==Njack)
-        c_yky(i,0)=yXXy(i,jack_index)/len[i];
-      else
-        c_yky(i,0)=yXXy(i,jack_index)/(len[i]-jack_bin[jack_index][i]);
-       
-      if(both_side_cov==true){
-	B1_i=XXz.block(0,(i*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
-	C1_i=B1_i.array()*all_Uzb.array();
-        C2_i=C1_i.colwise().sum();	
-	tk_res=C2_i.sum();  
-
-	if(jack_index==Njack)
-	  tk_res=tk_res/len[i]/Nz;
-        else
-	  tk_res=tk_res/(len[i]-jack_bin[jack_index][i])/Nz;
-
-        b_trk(i,0)=Nindv_mask-tk_res;
+      // double tk_res;
 
       // if(both_side_cov==false)	
       // 	b_trk(i,0)=Nindv_mask;
@@ -2076,10 +2051,10 @@ int main(int argc, char const *argv[]){
       //   c_yky(i,0)=yXXy(i,jack_index)/(len[i]-jack_bin[jack_index][i]);
        
       // if(both_side_cov==true){
-      // 	B1=XXz.block(0,(i*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
-      // 	C1=B1.array()*all_Uzb.array();
-      //   C2=C1.colwise().sum();	
-      // 	tk_res=C2.sum();  
+      // 	B1_i=XXz.block(0,(i*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
+      // 	C1_i=B1_i.array()*all_Uzb.array();
+      //   C2_i=C1_i.colwise().sum();	
+      // 	tk_res=C2_i.sum();  
 
       // 	if(jack_index==Njack)
       // 	  tk_res=tk_res/len[i]/Nz;
@@ -2087,71 +2062,75 @@ int main(int argc, char const *argv[]){
       // 	  tk_res=tk_res/(len[i]-jack_bin[jack_index][i])/Nz;
 
       //   b_trk(i,0)=Nindv_mask-tk_res;
+
+      if(both_side_cov==false)	
+      	b_trk(i,0)=Nindv_mask;
+
+      if( jack_index<Njack && len[i]==jack_bin[jack_index][i])
+      	jack_bin[jack_index][i]=0;
+
+
+      if(jack_index==Njack)
+        c_yky(i,0)=yXXy(i,jack_index)/len[i];
+      else
+        c_yky(i,0)=yXXy(i,jack_index)/(len[i]-jack_bin[jack_index][i]);
+       
+      if(both_side_cov==true){
+      	B1=XXz.block(0,(i*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
+      	C1=B1.array()*all_Uzb.array();
+        C2=C1.colwise().sum();	
+      	tk_res=C2.sum();  
+
+      	if(jack_index==Njack)
+      	  tk_res=tk_res/len[i]/Nz;
+        else
+      	  tk_res=tk_res/(len[i]-jack_bin[jack_index][i])/Nz;
+
+        b_trk(i,0)=Nindv_mask-tk_res;
       }
 
+#pragma omp parallel for schedule(dynamic, 1)
       for (int j=i;j<Nbin;j++){
+	MatrixXdr h1;
+	MatrixXdr h2;
+	MatrixXdr h3;
+
+	MatrixXdr B1_j;
+	MatrixXdr B2_j;
+	MatrixXdr C1_j;
+	MatrixXdr C2_j;
+
+	double trkij;
+	
+	double trkij_res1;
+	double trkij_res2;
+	double trkij_res3;
+  
 	//cout<<Njack<<endl;
-	B1=XXz.block(0,(i*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
-	B2=XXz.block(0,(j*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
-	// C1 = B1.cwiseProduct(B2);
-	// C2a=C1.colwise().sum();
-	C1=B1.array()*B2.array();
-	C2=C1.colwise().sum();
-	// cout << "C2a=" << C2a << ", C2=" << C2 << endl;
-	trkij=C2.sum();
+	B1_j=XXz.block(0,(i*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
+	B2_j=XXz.block(0,(j*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
+	C1_j=B1_j.array()*B2_j.array();
+	C2_j=C1_j.colwise().sum();
+	trkij=C2_j.sum();
 
 
 	if(both_side_cov==true){
 
-	  h1=covariate.transpose()*B1;
+	  h1=covariate.transpose()*B1_j;
 	  h2=Q*h1;
 	  h3=covariate*h2;
-	  C1=h3.array()*B2.array();
-	  C2=C1.colwise().sum();
-	  trkij_res1=C2.sum();
+	  C1_j=h3.array()*B2_j.array();
+	  C2_j=C1_j.colwise().sum();
+	  trkij_res1=C2_j.sum();
 
-	  /*h1=covariate.transpose()*B2;
-	    h2=Q*h1;
-	    h3=covariate*h2;
-	    C1=h3.array()*B1.array();
-	    C2=C1.colwise().sum();
-	    trkij_res2=C2.sum();
-	  */
-
-	  B1=XXUz.block(0,(i*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
-	  B2=UXXz.block(0,(j*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
-	  C1=B1.array()*B2.array();
-	  C2=C1.colwise().sum();
-	  trkij_res3=C2.sum();
+	  B1_j=XXUz.block(0,(i*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
+	  B2_j=UXXz.block(0,(j*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
+	  C1_j=B1_j.array()*B2_j.array();
+	  C2_j=C1_j.colwise().sum();
+	  trkij_res3=C2_j.sum();
 
 			
-	  /*			cout<<"trrrr"<<endl;
-				cout<<trkij<<endl;
-				cout<<trkij_res3<<endl;
-				//		cout<<trkij_res2<<endl;
-				cout<<trkij_res1<<endl;
-				cout<<"trrrr"<<endl;
-	  */
 	  trkij+=trkij_res3-trkij_res1-trkij_res1 ;
-	     
-			
-	  /*
-	    B1=Xz.block(0,(i*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
-	    h1=covariate.transpose()*B1; //W^tXz
-	    h2=Q*h1;  //QW^tXz
-		       
-	    C1=h2.array()*h1.array();
-	    C2=C1.colwise().sum();
-
-	    tk_res=C2.sum();	
-
-	    if(jack_index==Njack)
-	    tk_res=tk_res/len[i]/Nz;
-	    else
-	    tk_res=tk_res/(len[i]-jack_bin[jack_index][i])/Nz;	
-		
-	    b_trk(i,0)=Nindv_mask-tk_res;
-	  */
 	}
 
 
