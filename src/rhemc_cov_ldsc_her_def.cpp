@@ -13,6 +13,8 @@
 #include <Eigen/LU>
 #include <Eigen/SVD>
 #include <Eigen/QR>
+#include <ctime>
+
 #include "time.h"
 
 #include "genotype.h"
@@ -1962,14 +1964,6 @@ int main(int argc, char const *argv[]){
       yXXy(bin_index,jack_index)=yXXy(bin_index,Njack)-yXXy(bin_index,jack_index);
     }
   }
-
-
-
-
-
-
-  //cout<<"sum col "<<XXz.col(1).sum()<<endl;
-  //cout<<"yXXy"<<yXXy<<endl;
 	
   //// all XXy and yXXy and contributions of every jackknife subsamples  were computed till this line.
 
@@ -2008,12 +2002,6 @@ int main(int argc, char const *argv[]){
   else
     NC=Nindv_mask;
 
-
-
-
-
-
-
   MatrixXdr jack;
   MatrixXdr point_est;
   MatrixXdr enrich_jack;
@@ -2038,7 +2026,11 @@ int main(int argc, char const *argv[]){
   // double trkij_res2;
   // double trkij_res3;
   // double tk_res;
-  
+
+  time_t startTrainTime;
+  time(&startTrainTime);
+  clock_t startTrainClock = clock();
+
   for (jack_index=0;jack_index<=Njack;jack_index++){
 #pragma omp parallel for schedule(dynamic, 1)
     for (int i=0;i<Nbin;i++){
@@ -2186,6 +2178,12 @@ int main(int argc, char const *argv[]){
     */
 
   }//end of loop over jack
+  time_t endTrainTime;
+  time(&endTrainTime);
+  clock_t endTrainClock = clock();
+  double diffTrain = difftime(endTrainTime,startTrainTime);
+  cout << "Training took " << ((double)(endTrainClock - startTrainClock)) / (double)CLOCKS_PER_SEC
+                     << " cpu seconds or " << diffTrain << " seconds wall clock time." << endl;
 
 
   double temp_sig=0;
